@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Control Center</title>
+    <style>
+        :root { --neon: #00d2ff; --green: #39ff14; --bg: #050a10; --card: #0d1117; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 10px; }
+        .ai-card { width: 100%; max-width: 550px; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #30363d; display: flex; flex-direction: column; height: 90vh; }
+        #chat { flex: 1; overflow-y: auto; background: #000; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #30363d; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 14px; line-height: 1.4; }
+        .u-msg { align-self: flex-end; background: var(--green); color: black; border-bottom-right-radius: 2px; }
+        .a-msg { align-self: flex-start; background: #1c2128; color: var(--neon); border-bottom-left-radius: 2px; border: 1px solid var(--neon); }
+        .app-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 15px; background: #161b22; padding: 10px; border-radius: 12px; }
+        .app-btn { background: #0d1117; border: 1px solid #444; border-radius: 8px; padding: 8px 0; cursor: pointer; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #adbac7; }
+        .input-area { display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; background: #161b22; border: 1px solid #30363d; color: white; border-radius: 10px; outline: none; }
+        button { padding: 0 20px; background: var(--neon); border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: black; }
+    </style>
+</head>
+<body>
+
+<div class="ai-card">
+    <div class="app-grid">
+        <a href="https://instagram.com" target="_blank" class="app-btn"><i>📸</i>Insta</a>
+        <a href="https://youtube.com" target="_blank" class="app-btn"><i>📺</i>YouTube</a>
+        <a href="https://web.telegram.org" target="_blank" class="app-btn"><i>✈️</i>TG</a>
+        <a href="https://tiktok.com" target="_blank" class="app-btn"><i>🎵</i>TikTok</a>
+        <a href="https://google.com" target="_blank" class="app-btn"><i>🔍</i>Google</a>
+        <a href="https://chat.openai.com" target="_blank" class="app-btn"><i>💬</i>GPT</a>
+        <a href="https://roblox.com" target="_blank" class="app-btn"><i>🎮</i>Roblox</a>
+        <a href="https://capcut.com" target="_blank" class="app-btn"><i>🎬</i>CapCut</a>
+        <a href="https://github.com" target="_blank" class="app-btn"><i>🐙</i>GitHub</a>
+        <a href="https://wikipedia.org" target="_blank" class="app-btn"><i>📚</i>Wiki</a>
+    </div>
+
+    <div id="chat">
+        <div class="msg a-msg">Salom! Men tayyorman. Savol bering.</div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="inp" placeholder="Xabar yozing..." onkeydown="if(event.keyCode==13){ask(); return false;}" autocomplete="off">
+        <button onclick="ask()">></button>
+    </div>
+</div>
+
+<script>
+    function ask() {
+        const inputField = document.getElementById('inp');
+        const text = inputField.value.trim();
+        if (!text) return;
+
+        addMsg(text, 'user');
+        inputField.value = ""; 
+
+        let i = text.toLowerCase();
+        let res = "";
+
+        // 1. MULOQOT VA SAVOL-JAVOB
+        if (i === "salom") res = "Assalomu alaykum! Senga qanday yordam bera olaman?";
+        else if (i.includes("nima gap") || i.includes("nima yangilik")) res = "Hamma yo'q tinch, o'zingda nima gaplar? Senga yordamim kerakmi?";
+        else if (i.includes("qalay") || i.includes("yaxshimi")) res = "Zo'r, rahmat! Ishlarim joyida. Senda-chi?";
+        
+        // 2. MATEMATIKA (SO'Z BILAN)
+        let mathProc = i.replace(/bir/g, '1').replace(/ikki/g, '2').replace(/uch/g, '3')
+                        .replace(/to'rt/g, '4').replace(/besh/g, '5').replace(/olti/g, '6')
+                        .replace(/yetti/g, '7').replace(/sakkiz/g, '8').replace(/to'qqiz/g, '9')
+                        .replace(/nol/g, '0').replace(/qo'sh|qo'shish|\+/g, '+').replace(/ayir|ayirish|-/g, '-')
+                        .replace(/ko'paytir|karra|\*/g, '*').replace(/bo'l|bo'lish|\//g, '/')
+                        .replace(/ga/g, '').replace(/ni/g, '').replace(/\s/g, '');
+
+        if (/[\d+\-*/]/.test(mathProc)) {
+            try { 
+                let calc = eval(mathProc.match(/[\d+\-*/().]+/g).join(""));
+                res = "Javob: " + calc; 
+            } catch(e) {}
+        }
+
+        // 3. ILOVALARNI YOZUV ORQALI OCHISH
+        if (i.includes("open instagram")) { window.open("https://instagram.com", "_blank"); res = "Instagram ochilmoqda..."; }
+        else if (i.includes("open youtube")) { window.open("https://youtube.com", "_blank"); res = "YouTube ochilmoqda..."; }
+
+        // 4. SOAT VA MA'LUMOT
+        if (i.includes("soat")) res = "Hozirgi vaqt: " + new Date().toLocaleTimeString();
+        else if (i.includes("kimsan")) res = "Men Gemini 3 Flash modeliman, Google tomonidan yaratilgan AI yordamchisiman.";
+
+        if (!res) {
+            res = "Buni aniq bilmayman, Google-dan qidirib ko'ramizmi?";
+            let url = "https://google.com/search?q=" + encodeURIComponent(i);
+            setTimeout(() => {
+                const chat = document.getElementById('chat');
+                chat.innerHTML += `<div class="msg a-msg">${res} <br><a href="${url}" target="_blank" style="color:yellow; font-weight:bold;">[QIDIRISH]</a></div>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 500);
+            return;
+        }
+
+        setTimeout(() => addMsg(res, 'ai'), 400);
+    }
+
+    function addMsg(text, type) {
+        const chat = document.getElementById('chat');
+        const cls = (type === 'user') ? 'u-msg' : 'a-msg';
+        chat.innerHTML += `<div class="msg ${cls}">${text}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+    }
+</script>
+</body>
+</html>
